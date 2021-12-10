@@ -1,12 +1,13 @@
 #ifndef MEXCEL_CELLS_H
 #define MEXCEL_CELLS_H
 
-#include <string>
-#include <vector>
+#include "utiles.h"
+#define A_ASCII_POS 65
 
 typedef enum {
     NUMBER,
-    CLONE
+    CLONE,
+    COPY
 } c_Type;
 
 typedef struct CELL {
@@ -33,6 +34,10 @@ void set_cell (int i_row, int i_col, std::string value) {
 
     if ( value == "v" || value == "^" || value == ">" || value == "<" ) {
         newcell->type = CLONE;
+        newcell->vaot = value;
+    }
+    else if ( value[0] == ':' ) {
+        newcell->type = COPY;
         newcell->vaot = value;
     }
     else {
@@ -70,8 +75,27 @@ void clone_value (cell tcell, int idxrow, int idxcol) {
 
     toclone = columns[idxrow].child_s.at(idxcol);
     tcell->value = toclone->value;
+    tcell->type = NUMBER;
 }
 
+void copy_value (cell tcell, int idxrow, int idxcol) {
+    const int i_coltocp = tcell->vaot[1] - A_ASCII_POS;
+    const int i_rowtocp = stoi( substr(tcell->vaot, 2, tcell->vaot.size()) ) - 1;
+
+    if ( i_coltocp > ncols || i_rowtocp > nrows ) {
+        printf("Tyring to copy the value of another cell\n");
+        printf("This cell is out of range!\n");
+        printf("copy operation was defined at: (%d, %d)\n", idxrow, idxcol);
+        exit(1);
+    }
+
+
+    cell celltopoint = columns[i_rowtocp].child_s.at(i_coltocp);
+    if ( celltopoint->type == CLONE ) {
+        clone_value( celltopoint, i_rowtocp, i_coltocp );
+    }
+    tcell->value = celltopoint->value;
+}
 
 void start (const int _nrows, const int _ncols) {
     ncols = _ncols;
@@ -79,8 +103,13 @@ void start (const int _nrows, const int _ncols) {
 
     for (int i = 0; i < nrows; ++i) {
         for (int j = 0; j < ncols; ++j) {
+
             if ( columns[i].child_s[j]->type == CLONE ) {
                 clone_value( columns[i].child_s.at(j), i, j );
+            }
+
+            if ( columns[i].child_s[j]->type == COPY ) {
+                copy_value( columns[i].child_s.at(j), i, j );
             }
 
             printf("%d ", columns[i].child_s[j]->value);
