@@ -121,7 +121,8 @@ The output will be:
 - [ ] =min(from:to)
 - [ ] =moda(from:to)
 - [ ] =media(from:to, n)
-- [ ] =mediana(from:to, n)
+- [ ] =mediana(from:to)
+- [ ] print with format
 
 
 [idea from](https://github.com/tsoding/minicel)

@@ -70,8 +70,16 @@ void make_maths (cell tcell) {
     std::string number = "";
     while ( true ) {
         char _ = tcell->vaat[idx];
+        if ( _ == '-' && isdigit(tcell->vaat[idx + 1]) ) {
+            number += "-";
+            number += tcell->vaat[idx + 1];
+            operations.push_back( tcell->vaat[idx] );
+
+            idx+=2;
+        }
+
         if ( _ == '+' || _ == '-' || _ == '/' || _ == '*' || _ == '\0' ) {
-            if ( !isdigit( number[0] ) ) {
+            if ( !isdigit( number[0] ) && number[0] != '-' ) {
                 numbers.push_back( get_cell_by_coord(number)->value );
             }
             else {
