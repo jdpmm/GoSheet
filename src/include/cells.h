@@ -2,12 +2,14 @@
 #define MEXCEL_CELLS_H
 
 #include "utiles.h"
+#include "maths.h"
 #define A_ASCII_POS 65
 
 typedef enum {
     NUMBER,
     CLONE,
-    COPY
+    COPY,
+    ARITHMETIC
 } Type;
 
 typedef struct CELL {
@@ -29,6 +31,7 @@ int nrows_definitive;
 
 void clone_value (cell tcell, int irow, int icol);
 void copy_value (cell tcell);
+void make_maths (cell tcell);
 
 void check_no_loop (cell currentc) {
     cell auxnoloop = currentc->noloops->noloops;
@@ -57,6 +60,39 @@ cell get_cell_by_coord (const std::string _ord) {
     }
 
     return columns[irow].nodes.at(icol);
+}
+
+void make_maths (cell tcell) {
+    std::vector<char> operations;
+    std::vector<int> numbers;
+
+    int idx = 1;
+    std::string number = "";
+    while ( true ) {
+        char _ = tcell->vaat[idx];
+        if ( _ == '+' || _ == '-' || _ == '/' || _ == '*' || _ == '\0' ) {
+            if ( !isdigit( number[0] ) ) {
+                numbers.push_back( get_cell_by_coord(number)->value );
+            }
+            else {
+                numbers.push_back( stoi(number) );
+            }
+
+            operations.push_back( tcell->vaat[idx] );
+            number = "";
+            idx++;
+        }
+
+        if ( tcell->vaat[idx] == '\0' ) {
+            break;
+        }
+
+        number+=tcell->vaat[idx];
+        idx++;
+    }
+
+    operations.erase( operations.end() - 1 );
+    tcell->value = (int) arithmetic (&operations, &numbers);
 }
 
 void copy_value (cell tcell) {
@@ -130,7 +166,22 @@ void set_cell (int i_row, int i_col, std::string value) {
         newcell->vaat = value;
     }
     else if ( value[0] == ':' ) {
-        newcell->type = COPY;
+        // int search_arithmetic (std::string *line, int sidx) {
+        if ( search_arithmetic(&value, 1) == -1 ) {
+            newcell->type = COPY;
+        }
+        else {
+            if ( value.size() >= 3  ) {
+                newcell->type = ARITHMETIC;
+            }
+            else {
+                printf("Trying to make maths!\n");
+                printf("There aren't the enough number or operators\n");
+                printf("(%d, %d)\n", i_row + 1, i_col + 1);
+                exit(1);
+            }
+        }
+
         newcell->vaat = value;
     }
     else {
@@ -159,10 +210,9 @@ void start (const int _nrows, const int _ncols) {
                 copy_value( columns[i].nodes.at(j) );
             }
 
-            /*
-            if ( columns[i].child_s[j]->type == ARITHMETIC ) {
-                printf("(%d, %d)\n", i, j);
-            }*/
+            if ( columns[i].nodes[j]->type == ARITHMETIC ) {
+                make_maths(columns[i].nodes[j]);
+            }
 
             printf("%d ", columns[i].nodes[j]->value);
         }
@@ -174,123 +224,3 @@ void start (const int _nrows, const int _ncols) {
 
 #endif
 
-
-
-/*
-#include "utiles.h"
-#define A_ASCII_POS 65
-
-typedef enum {
-    NUMBER,
-    CLONE,
-    COPY,
-    ARITHMETIC
-} c_Type;
-
-typedef struct CELL {
-    int value { 0 };
-    c_Type type { NUMBER };
-    int coord[2];
-    int coordnl[2];
-    CELL* noloops { nullptr };
-
-    // value as another type, if isn't a number yet
-    std::string vaot { "-" };
-} *cell;
-
-typedef struct COL {
-    std::vector<cell> child_s;
-} col;
-
-col columns[26];
-int ncols;
-int nrows;
-cell detect_loop = nullptr;
-
-void clone_value (cell tcell, int idxrow, int idxcol);
-cell get_cell_by_coord (const std::string coord);
-void copy_value (cell tcell);
-
-void noloops_check (cell current, cell couldbeloop) {
-
-}
-
-void set_cell (int i_row, int i_col, std::string value) {
-    cell newcell = new (struct CELL);
-    newcell->coord[0] = i_row;
-    newcell->coord[1] = i_col;
-
-    if ( value == "v" || value == "^" || value == ">" || value == "<" ) {
-        newcell->type = CLONE;
-        newcell->vaot = value;
-    }
-    else if ( value[0] == ':' ) {
-        if ( search_arithmetic(&value, 0) != -1 ) {
-            newcell->type = ARITHMETIC;
-            newcell->vaot = value;
-        }
-        else {
-            newcell->type = COPY;
-            newcell->vaot = value;
-        }
-    }
-    else {
-        newcell->type = NUMBER;
-        newcell->value = stoi(value);
-    }
-
-    // i_row as index because i_row (nrows_defined as paramter) inc his value for each row on the table,
-    // so if we will use i_col (i as paramter) the table will be vertial (0, 1) -> (1, 0)
-    // because i_col inc his value for each value on the row
-    columns[i_row].child_s.push_back(newcell);
-}
-
-void clone_value (cell tcell, int idxrow, int idxcol) {
-    // only could be >, <, ^, v
-    std::string to = tcell->vaot;
-    cell toclone;
-
-    try {
-        if ( to == "^" && idxrow > 0 ) idxrow--;
-        else if ( to == "v" && idxrow < (nrows - 1) ) idxrow++;
-        else if ( to == "<" && idxcol > 0 ) idxcol--;
-        else if ( to == ">" && idxcol < (ncols - 1) ) idxcol++;
-
-        else {
-            throw "Out of range";
-        }
-    }
-
-    toclone = columns[idxrow].child_s.at(idxcol);
-
-    if ( toclone->type == COPY ) {
-        copy_value(toclone);
-    }
-
-    tcell->value = toclone->value;
-    tcell->type = NUMBER;
-}
-
-void copy_value (cell tcell) {
-    cell cellto_cp = get_cell_by_coord(tcell->vaot);
-
-    if ( tcell->noloops == nullptr ) {
-        tcell->noloops = cellto_cp;
-    }
-
-    if ( cellto_cp->type == CLONE ) {
-        clone_value ( cellto_cp, cellto_cp->coord[0], cellto_cp->coord[1] );
-    }
-    if ( cellto_cp->type == COPY ) {
-        copy_value(cellto_cp);
-    }
-
-    tcell->value = cellto_cp->value;
-    tcell->type = NUMBER;
-}
-
-
-
-
-#endif
-*/

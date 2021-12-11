@@ -97,7 +97,31 @@ Loop detected
 coord: (3, 2)
 ```
 
+## Arithmetic (:3+1)
 
-there are more operations! just give a few seconds...!
+To make one arithmetic operation you need at leaste one operator (+, *, / or -) and two numbers, looks like:
+```
+| :3+3  | :2-1  |
+| 3     | 4     |
+| :4/2  | :A1*2 |
+```
+
+The output will be:
+```
+| 6  | 1  |
+| 3  | 4  |
+| 2  | 12 |
+```
+
+## TODO
+- [ ] Arithmetic and negative numbers
+- [ ] =sum(from:to)
+- [ ] =max(from:to)
+- [ ] =min(from:to)
+- [ ] =min(from:to)
+- [ ] =moda(from:to)
+- [ ] =media(from:to, n)
+- [ ] =mediana(from:to, n)
+
 
 [idea from](https://github.com/tsoding/minicel)
