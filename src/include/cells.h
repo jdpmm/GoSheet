@@ -121,6 +121,9 @@ void realize_operation (cell tcell) {
             else if ( operation == "max" ) {
                 tcell->value = max_v(values);
             }
+            else if ( operation == "med" ) {
+                tcell->value = sum_v(values) / values.size();
+            }
 
         }
 

@@ -115,12 +115,12 @@ The output will be:
 
 ## TODO
 - [x] Arithmetic and negative numbers
-- [x] =sum(from:to)
-- [ ] =max(from:to)
-- [ ] =min(from:to)
-- [ ] =moa(from:to)
-- [ ] =med(from:to)
-- [ ] =mda(from:to)
+- [x] =sum(from : to)
+- [x] =max(from : to)
+- [x] =min(from : to)
+- [ ] =med(from : to)
+- [ ] =moa(col1, col2)
+- [ ] =mda(from : to)
 - [ ] print with format
 
 ---
