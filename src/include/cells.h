@@ -9,7 +9,8 @@ typedef enum {
     NUMBER,
     CLONE,
     COPY,
-    ARITHMETIC
+    ARITHMETIC,
+    OPERATION
 } Type;
 
 typedef struct CELL {
@@ -53,13 +54,67 @@ cell get_cell_by_coord (const std::string _ord) {
     const int icol = _ord[pre_icol] - A_ASCII_POS;
     const int irow = stoi( substr(_ord, pre_irow, _ord.size()) ) - 1;
 
-    if ( icol > ncolumns_definitive || irow > nrows_definitive ) {
+    if ( icol >= ncolumns_definitive || irow > nrows_definitive ) {
         printf("Tyring to get the value of another cell\n");
         printf("The cell is out of range!\n");
         exit(1);
     }
 
     return columns[irow].nodes.at(icol);
+}
+
+void get_values_range_cols (char column, int init, int end, std::vector<int> *v) {
+    int idxcolumn = column - A_ASCII_POS;
+    while ( init <= end ) {
+        v->push_back( columns[init].nodes[idxcolumn]->value );
+        init++;
+    }
+}
+
+void get_values_range_rows (int row, char init, char end, std::vector<int> *v) {
+    init = init - A_ASCII_POS;
+    while ( init <= (end - A_ASCII_POS) ) {
+        v->push_back( columns[row].nodes[init]->value );
+        init++;
+    }
+}
+
+void realize_operation (cell tcell) {
+    // tcell->vaat == =ope(A1:B4)
+    std::string operation = substr(tcell->vaat, 1, 4);
+    int index_colon = idx_of(&tcell->vaat, 0, ':');
+
+    if ( index_colon == -1 ) {
+        printf("The operation has fail\n");
+        printf("':' excepted");
+        printf("The operation has been defined at: (%d, %d)\n", tcell->coord[0] + 1, tcell->coord[1] + 1);
+        exit(1);
+    }
+    std::string coor1 = substr(tcell->vaat, 5, index_colon);
+    std::string coor2 = substr(tcell->vaat, index_colon + 1, tcell->vaat.size() - 1);
+
+    int row1 = stoi( substr(coor1, 1, coor1.size()) ) - 1;
+    int row2 = stoi( substr(coor2, 1, coor2.size()) ) - 1;
+
+    // save the values from one cell to another cell
+    std::vector<int> values;
+
+    if ( coor1[0] == coor2[0] && (coor1[0] - A_ASCII_POS) < ncolumns_definitive ) {
+        get_values_range_cols(coor1[0], row1, row2, &values);
+    }
+    else if ( row1 == row2 && row1 < nrows_definitive ) {
+        get_values_range_rows(row1, coor1[0], coor2[0], &values);
+    }
+    else {
+        printf("\nError!!\n");
+        printf("Index out range on operation!\n");
+        printf("The operation has been defined at: (%d, %d)\n", tcell->coord[0] + 1, tcell->coord[1] + 1);
+        exit(1);
+    }
+
+    if ( operation == "sum" ) {
+        tcell->value = sum_v(values);
+    }
 }
 
 void make_maths (cell tcell) {
@@ -101,6 +156,7 @@ void make_maths (cell tcell) {
 
     operations.erase( operations.end() - 1 );
     tcell->value = (int) arithmetic (&operations, &numbers);
+    tcell->value = NUMBER;
 }
 
 void copy_value (cell tcell) {
@@ -192,6 +248,10 @@ void set_cell (int i_row, int i_col, std::string value) {
 
         newcell->vaat = value;
     }
+    else if ( value[0] == '=' ) {
+        newcell->type = OPERATION;
+        newcell->vaat = value;
+    }
     else {
         newcell->type = NUMBER;
         newcell->value = stoi(value);
@@ -220,6 +280,10 @@ void start (const int _nrows, const int _ncols) {
 
             if ( columns[i].nodes[j]->type == ARITHMETIC ) {
                 make_maths(columns[i].nodes[j]);
+            }
+
+            if ( columns[i].nodes[j]->type == OPERATION ) {
+                realize_operation(columns[i].nodes[j]);
             }
 
             printf("%d ", columns[i].nodes[j]->value);

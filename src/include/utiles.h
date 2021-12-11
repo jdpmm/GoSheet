@@ -37,5 +37,24 @@ int search_arithmetic (std::string *line, int sidx) {
     return -1;
 }
 
+int idx_of (const std::string *line, int from, char search) {
+    int idx = from;
+    while ( line->at(idx) != '\0' ) {
+        if ( line->at(idx) == search ) {
+            return idx;
+        }
+        idx++;
+    }
+    return -1;
+}
+
+int sum_v (std::vector<int> v) {
+    int s = 0;
+    for (int i = 0; i < v.size(); ++i) {
+        s += v.at(i);
+    }
+    return s;
+}
+
 
 #endif

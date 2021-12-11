@@ -113,11 +113,30 @@ The output will be:
 | 2  | 12 |
 ```
 
+## Operations (=ope(from:to))
+
+Some operations of Excel
+
+- =sum
+Let you add each value of one column or row
+if you want all values from one column:
+```
+| 6           |    | 6 |
+| 3           | -> | 3 |
+| =sum(A1:A2) |    | 9 |
+```
+
+or one row
+```
+| 6 | 6 | =sum(A1:B1) | = | 6 | 6 | 12 |
+```
+
+
+
 ## TODO
-- [ ] Arithmetic and negative numbers
-- [ ] =sum(from:to)
+- [x] Arithmetic and negative numbers
+- [x] =sum(from:to)
 - [ ] =max(from:to)
-- [ ] =min(from:to)
 - [ ] =min(from:to)
 - [ ] =moda(from:to)
 - [ ] =media(from:to, n)
