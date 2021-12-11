@@ -56,5 +56,26 @@ int sum_v (std::vector<int> v) {
     return s;
 }
 
+int min_v (std::vector<int> v) {
+    int min = v.at(0);
+    for (int i = 1; i < v.size(); ++i) {
+        if ( v.at(i) < min ){
+            min = v.at(i);
+        }
+    }
+    return min;
+}
+
+int max_v (std::vector<int> v) {
+    int max = v.at(0);
+    for (int i = 1; i < v.size(); ++i) {
+        if ( v.at(i) > max ){
+            max = v.at(i);
+        }
+    }
+    return max;
+}
+
+
 
 #endif

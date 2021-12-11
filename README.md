@@ -113,35 +113,20 @@ The output will be:
 | 2  | 12 |
 ```
 
-## Operations (=ope(from:to))
-
-Some operations of Excel
-
-- =sum
-Let you add each value of one column or row
-if you want all values from one column:
-```
-| 6           |    | 6 |
-| 3           | -> | 3 |
-| =sum(A1:A2) |    | 9 |
-```
-
-or one row
-```
-| 6 | 6 | =sum(A1:B1) | = | 6 | 6 | 12 |
-```
-
-
-
 ## TODO
 - [x] Arithmetic and negative numbers
 - [x] =sum(from:to)
-- [ ] =max(from:to)
-- [ ] =min(from:to)
-- [ ] =moda(from:to)
-- [ ] =media(from:to, n)
-- [ ] =mediana(from:to)
+- [x] =max(from:to)
+- [x] =min(from:to)
+- [ ] =moa(from:to)
+- [ ] =med(from:to)
+- [ ] =mda(from:to)
 - [ ] print with format
 
+---
+
+[moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))
+[med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))
+[mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)
 
 [idea from](https://github.com/tsoding/minicel)
