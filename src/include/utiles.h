@@ -27,4 +27,15 @@ std::vector<std::string> split_str (std::string *line, char delimiter) {
     return nv;
 }
 
+int search_arithmetic (std::string *line, int sidx) {
+    for (sidx; sidx < line->size(); ++sidx) {
+        if ( line->at(sidx) == '+' || line->at(sidx) == '-' || line->at(sidx) == '*' || line->at(sidx) == '/' ) {
+            return sidx;
+        }
+    }
+
+    return -1;
+}
+
+
 #endif

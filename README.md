@@ -22,9 +22,10 @@ The output will be:
 | 5 | 2 | 3 | 5 |
 ```
 
-### No loops on clone operation
+### Loops
 
-Can not there be loops on this operation since each cell starts with a value of 0, so if you made something like:
+A loop error will be generated when one cell point to another cell and this cell point to the first cell, looks like:
+
 ```
 | 1 | 2 |
 | > | < |
@@ -33,20 +34,17 @@ Can not there be loops on this operation since each cell starts with a value of 
 
 The output will be:
 ```
-| 1 | 2 |
-| 0 | 0 |
-| 2 | 1 |
+[anothers cells values]
+Loop detected
+coord: (1, 2)
 ```
 
-because ```(1, 0)``` will copy the value ```(1, 1)``` but the value of ```(1, 1)``` is 0 since this cell is not a number, so
-```(1, 0) == (1, 1)``` 
-
-**The parser read from the top to the bottom and from left to the right**
+**The parser always read from the top to the bottom and from left to the right**
 
 ```
-| 1 | > | v |    | 1 | 0 | 0 |
-| > | 9 | v | == | 9 | 9 | 0 |
-| ^ | 9 | v | == | 9 | 9 | 0 |
+| 1 | > | v |    | 1 | 9 | 9 |
+| > | 9 | v | == | 9 | 9 | 9 |
+| ^ | 9 | v | == | 9 | 9 | 9 |
 | ^ | < | < |    | 9 | 9 | 9 |
 ```
 
@@ -69,7 +67,7 @@ So to copy one value:
 ```
 | 1  | 2   |
 | 3  | 4   |
-| 5  | :B3 |
+| 5  | :A1 |
 ```
 
 The output will be:
@@ -77,8 +75,28 @@ The output will be:
 ```
 | 1  | 2 |
 | 3  | 4 |
-| 5  | 6 |
+| 5  | 1 |
 ```
+
+### Loops
+
+A loop error will be generated when one cell try to copy the value of another and this cell try to copy the value of the first cell!!
+<br/>
+Looks like:
+```
+| :B3  | 2   |
+| 3    | 4   |
+| 5    | :A1 |
+```
+
+The output will be:
+
+```
+[anothers cells values]
+Loop detected
+coord: (3, 2)
+```
+
 
 there are more operations! just give a few seconds...!
 
