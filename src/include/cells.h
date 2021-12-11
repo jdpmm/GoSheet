@@ -115,6 +115,13 @@ void realize_operation (cell tcell) {
             if ( operation == "sum" ) {
                 tcell->value = sum_v(values);
             }
+            else if ( operation == "min" ) {
+                tcell->value = min_v(values);
+            }
+            else if ( operation == "max" ) {
+                tcell->value = max_v(values);
+            }
+
         }
 
         else {
