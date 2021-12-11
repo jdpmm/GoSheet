@@ -116,8 +116,8 @@ The output will be:
 ## TODO
 - [x] Arithmetic and negative numbers
 - [x] =sum(from:to)
-- [x] =max(from:to)
-- [x] =min(from:to)
+- [ ] =max(from:to)
+- [ ] =min(from:to)
 - [ ] =moa(from:to)
 - [ ] =med(from:to)
 - [ ] =mda(from:to)
@@ -125,8 +125,12 @@ The output will be:
 
 ---
 
-[moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))
-[med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))
-[mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)
+## ???
+
+- [moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))
+
+- [med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))
+
+- [mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)
 
 [idea from](https://github.com/tsoding/minicel)
