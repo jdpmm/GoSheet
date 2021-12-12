@@ -6,7 +6,6 @@
 
 int ncolumns_defined = 0;
 int nrows_defined = 0;
-//std::vector<std::vector<std::string>> valuescells;
 
 void lexer (const std::string &line) {
     std::string cleanline = "";

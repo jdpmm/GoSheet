@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 std::string substr (std::string cont, int f, int t) {
     std::string ns = "";
@@ -85,6 +86,21 @@ int mda_v (std::vector<int> v) {
     int idxcentral = (v.size() / 2) - 1;
     int sum_ = v.at(idxcentral) + v.at(idxcentral + 1);
     return sum_ / 2;
+}
+
+int moa_v (std::vector<int> v) {
+    int current = v.at(0);
+    int fi_c = count(v.begin(), v.end(), current);
+
+    for (int i = 1; i < v.size(); ++i) {
+        int fi_this = count(v.begin(), v.end(), v.at(i));
+        if ( fi_this > fi_c ) {
+            current = v.at(i);
+            fi_c = fi_this;
+        }
+    }
+
+    return current;
 }
 
 

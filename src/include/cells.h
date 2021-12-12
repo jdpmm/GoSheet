@@ -26,7 +26,7 @@ typedef struct COL {
     std::vector<cell> nodes;
 } col;
 
-col columns[26];
+col columns[10000];
 int ncolumns_definitive;
 int nrows_definitive;
 
@@ -92,53 +92,51 @@ void realize_operation (cell tcell) {
 
     std::string operation = substr(tcell->vaat, 1, 4);
 
-    if ( operation != "moa" ) {
-        std::string coor1 = substr(tcell->vaat, 5, index_colon);
-        std::string coor2 = substr(tcell->vaat, index_colon + 1, tcell->vaat.size() - 1);
+    std::string coor1 = substr(tcell->vaat, 5, index_colon);
+    std::string coor2 = substr(tcell->vaat, index_colon + 1, tcell->vaat.size() - 1);
 
-        int row1 = stoi( substr(coor1, 1, coor1.size()) ) - 1;
-        int row2 = stoi( substr(coor2, 1, coor2.size()) ) - 1;
-        std::vector<int> values;
+    int row1 = stoi( substr(coor1, 1, coor1.size()) ) - 1;
+    int row2 = stoi( substr(coor2, 1, coor2.size()) ) - 1;
+    std::vector<int> values;
 
-        bool inrange_columns = ( (coor1[0] - A_ASCII_POS) < ncolumns_definitive ) && ( (coor2[0] - A_ASCII_POS) < ncolumns_definitive );
-        bool inrange_rows = ( row1 < nrows_definitive ) && ( row2 < nrows_definitive );
-        bool inrange = inrange_columns && inrange_rows;
+    bool inrange_columns = ( (coor1[0] - A_ASCII_POS) < ncolumns_definitive ) && ( (coor2[0] - A_ASCII_POS) < ncolumns_definitive );
+    bool inrange_rows = ( row1 < nrows_definitive ) && ( row2 < nrows_definitive );
+    bool inrange = inrange_columns && inrange_rows;
 
-        if ( inrange ) {
-            if ( coor1[0] == coor2[0] ) {
-                get_values_range_cols(coor1[0], row1, row2, &values);
-            }
-            else if ( row1 == row2 ) {
-                get_values_range_rows(row1, coor1[0], coor2[0], &values);
-            }
-
-            if ( operation == "sum" ) {
-                tcell->value = sum_v(values);
-            }
-            else if ( operation == "min" ) {
-                tcell->value = min_v(values);
-            }
-            else if ( operation == "max" ) {
-                tcell->value = max_v(values);
-            }
-            else if ( operation == "med" ) {
-                tcell->value = sum_v(values) / values.size();
-            }
-            else if ( operation == "mda" ) {
-                tcell->value = mda_v(values);
-            }
-
+    if ( inrange ) {
+        if ( coor1[0] == coor2[0] ) {
+            get_values_range_cols(coor1[0], row1, row2, &values);
+        }
+        else if ( row1 == row2 ) {
+            get_values_range_rows(row1, coor1[0], coor2[0], &values);
         }
 
-        else {
-            printf("\nError!!\n");
-            printf("Index out range on operation!\n");
-            printf("The operation has been defined at: (%d, %d)\n", tcell->coord[0] + 1, tcell->coord[1] + 1);
-            exit(1);
+        if ( operation == "sum" ) {
+            tcell->value = sum_v(values);
         }
-
+        else if ( operation == "min" ) {
+            tcell->value = min_v(values);
+        }
+        else if ( operation == "max" ) {
+            tcell->value = max_v(values);
+        }
+        else if ( operation == "med" ) {
+            tcell->value = sum_v(values) / values.size();
+        }
+        else if ( operation == "mda" ) {
+            tcell->value = mda_v(values);
+        }
+        else if ( operation == "moa" ) {
+            tcell->value = moa_v(values);
+        }
     }
 
+    else {
+        printf("\nError!!\n");
+        printf("Index out range on operation!\n");
+        printf("The operation has been defined at: (%d, %d)\n", tcell->coord[0] + 1, tcell->coord[1] + 1);
+        exit(1);
+    }
 
 }
 
