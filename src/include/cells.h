@@ -124,6 +124,9 @@ void realize_operation (cell tcell) {
             else if ( operation == "med" ) {
                 tcell->value = sum_v(values) / values.size();
             }
+            else if ( operation == "mda" ) {
+                tcell->value = mda_v(values);
+            }
 
         }
 

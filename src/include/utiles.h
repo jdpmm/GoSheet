@@ -76,6 +76,17 @@ int max_v (std::vector<int> v) {
     return max;
 }
 
+int mda_v (std::vector<int> v) {
+    if ( (v.size() % 2) != 0 ) {
+        int idx = (v.size() + 1) / 2;
+        return v.at( idx - 1 );
+    }
+
+    int idxcentral = (v.size() / 2) - 1;
+    int sum_ = v.at(idxcentral) + v.at(idxcentral + 1);
+    return sum_ / 2;
+}
+
 
 
 #endif

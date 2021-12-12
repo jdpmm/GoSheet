@@ -118,9 +118,9 @@ The output will be:
 - [x] =sum(from : to)
 - [x] =max(from : to)
 - [x] =min(from : to)
-- [ ] =med(from : to)
-- [ ] =moa(col1, col2)
-- [ ] =mda(from : to)
+- [x] =med(from : to)
+- [x] =mda(from : to)
+- [ ] =moa(col1 : to)
 - [ ] print with format
 
 ---
