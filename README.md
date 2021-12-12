@@ -120,8 +120,8 @@ The output will be:
 - [x] =min(from : to)
 - [x] =med(from : to)
 - [x] =mda(from : to)
-- [x] =moa(col1 : to)
-- [ ] print with format
+- [x] =moa(from : to)
+- [x] print with format
 
 ---
 

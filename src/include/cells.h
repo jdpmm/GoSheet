@@ -138,6 +138,7 @@ void realize_operation (cell tcell) {
         exit(1);
     }
 
+    tcell->type = NUMBER;
 }
 
 void make_maths (cell tcell) {
@@ -290,9 +291,26 @@ void set_cell (int i_row, int i_col, std::string value) {
     rows[i_row].nodes.push_back(newcell);
 }
 
+void print (int nmax) {
+    for (int i = 0; i < nrows_definitive; ++i) {
+        for (int j = 0; j < ncolumns_definitive; ++j) {
+
+            printf("%d", rows[i].nodes[j]->value);
+            int nspaces = nmax - std::to_string(rows[i].nodes[j]->value).size();
+            for (int x = 0; x < nspaces; ++x) {
+                printf(" ");
+            }
+            printf("│ ");
+
+        }
+        printf("\n");
+    }
+}
+
 void start (const int _nrows, const int _ncols) {
     ncolumns_definitive = _ncols;
     nrows_definitive = _nrows;
+    int max_numebers = 1;
 
     for (int i = 0; i < nrows_definitive; ++i) {
         for (int j = 0; j < ncolumns_definitive; ++j) {
@@ -313,11 +331,15 @@ void start (const int _nrows, const int _ncols) {
                 realize_operation(rows[i].nodes[j]);
             }
 
-            printf("%d ", rows[i].nodes[j]->value);
+            // searching the number with more digits!
+            std::string ns = std::to_string(rows[i].nodes[j]->value);
+            if ( (int) ns.size() > max_numebers ) {
+                max_numebers = ns.size();
+            }
         }
-        printf("\n");
     }
 
+    print(max_numebers + 1);
 }
 
 
