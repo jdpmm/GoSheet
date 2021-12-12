@@ -26,7 +26,7 @@ typedef struct COL {
     std::vector<cell> nodes;
 } col;
 
-col columns[10000];
+col rows[10000];
 int ncolumns_definitive;
 int nrows_definitive;
 
@@ -54,19 +54,19 @@ cell get_cell_by_coord (const std::string _ord) {
     const int icol = _ord[pre_icol] - A_ASCII_POS;
     const int irow = stoi( substr(_ord, pre_irow, _ord.size()) ) - 1;
 
-    if ( icol >= ncolumns_definitive || irow > nrows_definitive ) {
+    if ( icol >= ncolumns_definitive || irow >= nrows_definitive ) {
         printf("Tyring to get the value of another cell\n");
         printf("The cell is out of range!\n");
         exit(1);
     }
 
-    return columns[irow].nodes.at(icol);
+    return rows[irow].nodes.at(icol);
 }
 
 void get_values_range_cols (char column, int init, int end, std::vector<int> *v) {
     int idxcolumn = column - A_ASCII_POS;
     while ( init <= end ) {
-        v->push_back( columns[init].nodes[idxcolumn]->value );
+        v->push_back( rows[init].nodes[idxcolumn]->value );
         init++;
     }
 }
@@ -74,7 +74,7 @@ void get_values_range_cols (char column, int init, int end, std::vector<int> *v)
 void get_values_range_rows (int row, char init, char end, std::vector<int> *v) {
     init = init - A_ASCII_POS;
     while ( init <= (end - A_ASCII_POS) ) {
-        v->push_back( columns[row].nodes[init]->value );
+        v->push_back( rows[row].nodes[init]->value );
         init++;
     }
 }
@@ -143,43 +143,47 @@ void realize_operation (cell tcell) {
 void make_maths (cell tcell) {
     std::vector<char> operations;
     std::vector<int> numbers;
-
-    int idx = 1;
     std::string number = "";
-    while ( true ) {
-        char _ = tcell->vaat[idx];
-        if ( _ == '-' && isdigit(tcell->vaat[idx + 1]) ) {
-            number += "-";
-            number += tcell->vaat[idx + 1];
-            operations.push_back( tcell->vaat[idx] );
+    int idx = 1;
 
-            idx+=2;
+    while (true) {
+        if ( tcell->vaat[idx] == '-' && isdigit(tcell->vaat[idx + 1]) && !isdigit(tcell->vaat[idx - 1]) ) {
+            number += tcell->vaat[idx];
+            idx++;
+            while ( isdigit(tcell->vaat[idx]) ) {
+                number += tcell->vaat[idx];
+                idx++;
+            }
         }
 
-        if ( _ == '+' || _ == '-' || _ == '/' || _ == '*' || _ == '\0' ) {
-            if ( !isdigit( number[0] ) && number[0] != '-' ) {
-                numbers.push_back( get_cell_by_coord(number)->value );
-            }
-            else {
+        if ( tcell->vaat[idx] == '+' || tcell->vaat[idx] == '-' || tcell->vaat[idx] == '*' || tcell->vaat[idx] == '/' || tcell->vaat[idx] == '\0' ) {
+            operations.push_back( tcell->vaat[idx] );
+
+            // a normal number: -3 or 3
+            if ( number[0] == '-' || isdigit(number[0]) ) {
                 numbers.push_back( stoi(number) );
             }
+            // a value from one cell
+            else {
+                numbers.push_back( get_cell_by_coord(number)->value );
+            }
 
-            operations.push_back( tcell->vaat[idx] );
             number = "";
-            idx++;
+        }
+        else {
+            number += tcell->vaat[idx];
         }
 
         if ( tcell->vaat[idx] == '\0' ) {
             break;
         }
-
-        number+=tcell->vaat[idx];
         idx++;
     }
+    // removing '\0'
+    operations.erase(operations.end() - 1);
 
-    operations.erase( operations.end() - 1 );
     tcell->value = (int) arithmetic (&operations, &numbers);
-    tcell->value = NUMBER;
+    tcell->type = NUMBER;
 }
 
 void copy_value (cell tcell) {
@@ -225,7 +229,7 @@ void clone_value (cell tcell, int irow, int icol) {
         exit(1);
     }
 
-    toclone = columns[irow].nodes.at(icol);
+    toclone = rows[irow].nodes.at(icol);
     if ( toclone->type != NUMBER ) {
         tcell->noloops = toclone;
         check_no_loop(tcell);
@@ -283,7 +287,7 @@ void set_cell (int i_row, int i_col, std::string value) {
     // i_row as index because i_row (nrows_defined as paramter) inc his value for each row on the table,
     // so if we will use i_col (i as paramter) the table will be vertial (0, 1) -> (1, 0)
     // because i_col inc his value for each value on the row
-    columns[i_row].nodes.push_back(newcell);
+    rows[i_row].nodes.push_back(newcell);
 }
 
 void start (const int _nrows, const int _ncols) {
@@ -293,23 +297,23 @@ void start (const int _nrows, const int _ncols) {
     for (int i = 0; i < nrows_definitive; ++i) {
         for (int j = 0; j < ncolumns_definitive; ++j) {
 
-            if ( columns[i].nodes[j]->type == CLONE ) {
-                clone_value( columns[i].nodes.at(j), i, j );
+            if ( rows[i].nodes[j]->type == CLONE ) {
+                clone_value( rows[i].nodes.at(j), i, j );
             }
 
-            if ( columns[i].nodes[j]->type == COPY ) {
-                copy_value( columns[i].nodes.at(j) );
+            if ( rows[i].nodes[j]->type == COPY ) {
+                copy_value( rows[i].nodes.at(j) );
             }
 
-            if ( columns[i].nodes[j]->type == ARITHMETIC ) {
-                make_maths(columns[i].nodes[j]);
+            if ( rows[i].nodes[j]->type == ARITHMETIC ) {
+                make_maths(rows[i].nodes[j]);
             }
 
-            if ( columns[i].nodes[j]->type == OPERATION ) {
-                realize_operation(columns[i].nodes[j]);
+            if ( rows[i].nodes[j]->type == OPERATION ) {
+                realize_operation(rows[i].nodes[j]);
             }
 
-            printf("%d ", columns[i].nodes[j]->value);
+            printf("%d ", rows[i].nodes[j]->value);
         }
         printf("\n");
     }
