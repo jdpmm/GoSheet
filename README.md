@@ -118,17 +118,9 @@ The output will be:
 - [x] =sum(from : to)
 - [x] =max(from : to)
 - [x] =min(from : to)
-- [x] =med(from : to)
-- [x] =mda(from : to)
-- [x] =moa(from : to)
 - [x] print with format
-
----
-
-## ???
-
-- [moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))
-- [med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))
-- [mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)
+- [moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))(from : to)
+- [med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))(from : to)
+- [mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)(from : to)
 
 [idea from](https://github.com/tsoding/minicel)
