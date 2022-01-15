@@ -119,8 +119,8 @@ The output will be:
 - [x] =max(from : to)
 - [x] =min(from : to)
 - [x] print with format
-- [x] [moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))(from : to)
-- [x] [med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))(from : to)
-- [x] [mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)(from : to)
+- [x] =[moa](https://es.wikipedia.org/wiki/Moda_(estad%C3%ADstica))(from : to)
+- [x] =[med](https://es.wikipedia.org/wiki/Media_(matem%C3%A1ticas))(from : to)
+- [x] =[mda](https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,un%20conjunto%20de%20datos%20ordenados.)(from : to)
 
 [idea from](https://github.com/tsoding/minicel)
