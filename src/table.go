@@ -12,6 +12,7 @@ const (
     BOOL
     UNKNOWN
     COPY_OP
+    ERROR
 )
 
 type CELL struct {

@@ -42,10 +42,16 @@ func Op_copy (row int, col int) {
     var thsCell *CELL = &Table[row][col]
 
     row_cpy, col_cpy := op_getcoords_cell(thsCell.content)
-    // if row_cpy == no_looprow && col_cpy == no_loopcol {}
+    if row_cpy == no_looprow && col_cpy == no_loopcol {
+        thsCell.content = "!ERR!"
+        thsCell.celltype = ERROR
+        return
+    }
 
     var cpyCell *CELL = &Table[row_cpy][col_cpy]
-    // if cpyCell.celltype == COPY_OP {}
+    if cpyCell.celltype == COPY_OP {
+        Op_copy(row_cpy, col_cpy)
+    }
 
     thsCell.content = cpyCell.content
     thsCell.celltype = cpyCell.celltype
