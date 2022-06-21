@@ -11,6 +11,7 @@ const (
     STRING
     BOOL
     UNKNOWN
+    COPY_OP
 )
 
 type CELL struct {
@@ -55,6 +56,7 @@ func tbl_setcell (content string, row int, col int) {
     isnumber, _ := regexp.Compile("^(\\d+|\\d+\\.\\d+)$")
     isbool,   _ := regexp.Compile("^(TRUE|FALSE)$")
     isstring, _ := regexp.Compile("^\".*\"$")
+    iscopyop, _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$");
 
     var newC CELL
     newC.row = row;
@@ -66,6 +68,8 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = BOOL
     } else if isstring.MatchString(content) {
         newC.celltype = STRING
+    } else if iscopyop.MatchString(content) {
+        newC.celltype = COPY_OP
     } else {
         newC.celltype = UNKNOWN
         newC.content = "!ERR!"
@@ -73,9 +77,9 @@ func tbl_setcell (content string, row int, col int) {
     Table[row][col] = newC
 }
 
-func tbl_print (Ccell CELL) {
-    fmt.Printf(" %s ", Ccell.content)
-    for spc := 0; spc < (max_dig - len(Ccell.content)); spc++ {
+func tbl_print (content string) {
+    fmt.Printf(" %s ", content)
+    for spc := 0; spc < (max_dig - len(content)); spc++ {
         fmt.Printf(" ")
     }
 }
@@ -100,13 +104,17 @@ func Tbl_getrow (rowstr string, rowint int) {
 }
 
 func Tbl_maketable () {
-    var cCell CELL
+    var cCell *CELL
     for c_row := 0; c_row < max_row; c_row++ {
         for c_col := 0; c_col < max_col; c_col++ {
-            cCell = Table[c_row][c_col]
+            cCell = &Table[c_row][c_col]
+            Op_setnoloops(-1, -1)
 
+            if cCell.celltype == COPY_OP {
+                Op_copy(c_row, c_col)
+            }
 
-            tbl_print(cCell)
+            tbl_print(cCell.content)
         }
         fmt.Printf("\n");
     }
