@@ -1,0 +1,3 @@
+-4        | "Hola"    | FALSE     |
+=ABS(=A0) | =ABS(=B0) | =ABS(=C0) |
+=B2       | =ABS(=C2) | -34.54    |

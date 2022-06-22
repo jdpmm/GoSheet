@@ -12,6 +12,7 @@ const (
     BOOL
     UNKNOWN
     COPY_OP
+    ABS_OP
     ERROR
 )
 
@@ -54,10 +55,11 @@ func tbl_aux_stripwhitespaces (str string) string {
 }
 
 func tbl_setcell (content string, row int, col int) {
-    isnumber, _ := regexp.Compile("^(\\d+|\\d+\\.\\d+)$")
+    isnumber, _ := regexp.Compile("^(-|)(\\d+|\\d+\\.\\d+)$")
     isbool,   _ := regexp.Compile("^(TRUE|FALSE)$")
     isstring, _ := regexp.Compile("^\".*\"$")
     iscopyop, _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$");
+    isabsop,  _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$");
 
     var newC CELL
     newC.row = row;
@@ -71,6 +73,8 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = STRING
     } else if iscopyop.MatchString(content) {
         newC.celltype = COPY_OP
+    } else if isabsop.MatchString(content) {
+        newC.celltype = ABS_OP
     } else {
         newC.celltype = UNKNOWN
         newC.content = "!ERR!"
@@ -113,6 +117,9 @@ func Tbl_maketable () {
 
             if cCell.celltype == COPY_OP {
                 Op_copy(c_row, c_col)
+            }
+            if cCell.celltype == ABS_OP {
+                Op_abs(c_row, c_col)
             }
 
             tbl_print(cCell.content)
