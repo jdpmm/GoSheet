@@ -102,6 +102,7 @@ func Op_bin (row int, col int) {
     var thsCell *CELL = &Table[row][col]
     var argument string = op_getargument(thsCell.content)
 
+    var binvalue string
     if argument[0] == '=' {
         var cpyCell *CELL = op_getsingle_cell(argument)
         if cpyCell.celltype != INTEGER {
@@ -110,10 +111,18 @@ func Op_bin (row int, col int) {
             return
         }
         numint, _ := strconv.Atoi(cpyCell.content)
-        thsCell.content = strconv.FormatInt( int64(numint), 2 )
+        binvalue = strconv.FormatInt( int64(numint), 2 )
     } else {
         numint, _ := strconv.Atoi(argument)
-        thsCell.content = strconv.FormatInt( int64(numint), 2 )
+        binvalue = strconv.FormatInt( int64(numint), 2 )
     }
+
+    if binvalue[0] == '-' {
+        binvalue = "-0b" + binvalue[1:]
+    } else {
+        binvalue = "0b" + binvalue
+    }
+
+    thsCell.content = binvalue
     thsCell.celltype = BINARY_NUM
 }

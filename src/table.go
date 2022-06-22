@@ -59,7 +59,7 @@ func tbl_setcell (content string, row int, col int) {
     isfloat,   _ := regexp.Compile("^(-|)\\d+.\\d+$")
     isbool,    _ := regexp.Compile("^(TRUE|FALSE)$")
     isstring,  _ := regexp.Compile("^\".*\"$")
-    isbinary,  _ := regexp.Compile("^[0-1]+$")
+    isbinary,  _ := regexp.Compile("^(-|)0b[0-1]+$")
 
     iscopyop,  _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$");
     isabsop,   _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$");
