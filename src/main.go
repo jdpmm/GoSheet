@@ -27,4 +27,5 @@ func main () {
         rowvalue++
     }
     Tbl_maketable()
+    Tbl_printable()
 }

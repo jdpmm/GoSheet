@@ -2,3 +2,24 @@ Mexcel (Mini excel)
 ===================
 This project start like on December of 2021 with C++, but i'm gonna improve it and change of programming language (Golang instead of C++) because i wanna learn Go.
 At the moment i'm still working on it, when it has been finished i'll put all information here :D.
+
+0==========================0
+Errors
+0==========================0
+    ~ !UNK!: Unknown type.
+    ~ !N/A!: Not available, may be a loop has happened.
+    ~ !REF!: There is not a correct argument to any
+    ~ !NUM!: Trying to change the base of anything some invalid argument.
+
+0==========================0
+Functions
+0==========================0
+    ~ =XY (it's not a function):
+        ~ X: Column [A-Z]
+        ~ Y: Row    [0-499]
+        It's able to copy the content from another cell.
+    ~ =ABS(=XY):
+        Abs mathematical function, only works if the argument is a coordinate
+        of another cell.
+    ~ =BIN(=XY) or =BIN(UNISGNED_INTEGER_NUMBER):
+        Converts any unisgned integer number to its binary representation.

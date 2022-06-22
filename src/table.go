@@ -7,12 +7,14 @@ import (
 
 type CELL_TYPE int
 const (
-    NUMBER = iota
+    INTEGER = iota
+    FLOAT
     STRING
     BOOL
-    UNKNOWN
+    BINARY_NUM
     COPY_OP
     ABS_OP
+    BIN_OP
     ERROR
 )
 
@@ -48,36 +50,46 @@ func tbl_aux_stripwhitespaces (str string) string {
         }
     }
 
-    if len(newstr) > max_dig {
-        max_dig = len(newstr)
-    }
+
     return newstr
 }
 
 func tbl_setcell (content string, row int, col int) {
-    isnumber, _ := regexp.Compile("^(-|)(\\d+|\\d+\\.\\d+)$")
-    isbool,   _ := regexp.Compile("^(TRUE|FALSE)$")
-    isstring, _ := regexp.Compile("^\".*\"$")
-    iscopyop, _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$");
-    isabsop,  _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$");
+    isinteger, _ := regexp.Compile("^(-|)\\d+$")
+    isfloat,   _ := regexp.Compile("^(-|)\\d+.\\d+$")
+    isbool,    _ := regexp.Compile("^(TRUE|FALSE)$")
+    isstring,  _ := regexp.Compile("^\".*\"$")
+    isbinary,  _ := regexp.Compile("^[0-1]+$")
+
+    iscopyop,  _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$");
+    isabsop,   _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$");
+    isbinop,   _ := regexp.Compile("^=BIN\\((=[A-Z]{1}[0-9]{1,3}|[0-9]+)\\)$");
+
 
     var newC CELL
     newC.row = row;
     newC.col = col;
     newC.content = content;
-    if isnumber.MatchString(content) {
-        newC.celltype = NUMBER
+    if isinteger.MatchString(content) {
+        newC.celltype = INTEGER
+    } else if isfloat.MatchString(content) {
+        newC.celltype = FLOAT
     } else if isbool.MatchString(content) {
         newC.celltype = BOOL
     } else if isstring.MatchString(content) {
         newC.celltype = STRING
+        newC.content = content[1:len(content) - 1] // removes the quotes
+    } else if isbinary.MatchString(content) {
+        newC.celltype = BINARY_NUM
     } else if iscopyop.MatchString(content) {
         newC.celltype = COPY_OP
     } else if isabsop.MatchString(content) {
         newC.celltype = ABS_OP
+    } else if isbinop.MatchString(content) {
+        newC.celltype = BIN_OP
     } else {
-        newC.celltype = UNKNOWN
-        newC.content = "!ERR!"
+        newC.celltype = ERROR
+        newC.content = "!UNK!"
     }
     Table[row][col] = newC
 }
@@ -121,9 +133,22 @@ func Tbl_maketable () {
             if cCell.celltype == ABS_OP {
                 Op_abs(c_row, c_col)
             }
+            if cCell.celltype == BIN_OP {
+                Op_bin(c_row, c_col)
+            }
 
-            tbl_print(cCell.content)
+            if len(cCell.content) > max_dig {
+                max_dig = len(cCell.content)
+            }
         }
-        fmt.Printf("\n");
+    }
+}
+
+func Tbl_printable () {
+    for c_row := 0; c_row < max_row; c_row++ {
+        for c_col := 0; c_col < max_col; c_col++ {
+            tbl_print(Table[c_row][c_col].content)
+        }
+        fmt.Println()
     }
 }

@@ -29,6 +29,20 @@ func op_getcoords_cell (strcont string) (int, int) {
      return row, col
 }
 
+func op_getsingle_cell (coord string) *CELL {
+    /**
+     * When the argument of some function is the coordinate
+     * of some cell this funcion will be called to get
+     * that specific cell
+     * **/
+    row_arg, col_arg := op_getcoords_cell(coord)
+    var cellagr *CELL = &Table[row_arg][col_arg]
+    return cellagr
+}
+
+func op_getargument (cellcont string) string {
+    return cellcont[5:len(cellcont) - 1]
+}
 
 func Op_setnoloops (row int, col int) {
     no_looprow = row
@@ -43,7 +57,7 @@ func Op_copy (row int, col int) {
 
     row_cpy, col_cpy := op_getcoords_cell(thsCell.content)
     if row_cpy == no_looprow && col_cpy == no_loopcol {
-        thsCell.content = "!ERR!"
+        thsCell.content = "!N/A!"
         thsCell.celltype = ERROR
         return
     }
@@ -53,6 +67,8 @@ func Op_copy (row int, col int) {
         Op_copy(row_cpy, col_cpy)
     } else if cpyCell.celltype == ABS_OP {
         Op_abs(row_cpy, col_cpy)
+    } else if cpyCell.celltype == BIN_OP {
+        Op_bin(row_cpy, col_cpy)
     }
 
     thsCell.content = cpyCell.content
@@ -61,17 +77,15 @@ func Op_copy (row int, col int) {
 
 func Op_abs (row int, col int) {
     var thsCell *CELL = &Table[row][col]
-    var argument string = thsCell.content[5:len(thsCell.content) - 1]
-
-    row_cpy, col_cpy := op_getcoords_cell(argument)
-    var cpyCell *CELL = &Table[row_cpy][col_cpy]
+    var argument string = op_getargument(thsCell.content)
+    var cpyCell *CELL = op_getsingle_cell(argument)
 
     /**
      * Abs operation is only to cells that already has some value.
      * It means abs function won't call another function to fill the value
      * in the current cell.
      * **/
-    if cpyCell.celltype == NUMBER {
+    if cpyCell.celltype == INTEGER || cpyCell.celltype == FLOAT {
         if cpyCell.content[0] == '-' {
             thsCell.content = cpyCell.content[1:]
         } else {
@@ -79,7 +93,27 @@ func Op_abs (row int, col int) {
         }
         thsCell.celltype = cpyCell.celltype
     } else {
-        thsCell.content = "!ERR!"
+        thsCell.content = "!REF!"
         thsCell.celltype = ERROR
     }
+}
+
+func Op_bin (row int, col int) {
+    var thsCell *CELL = &Table[row][col]
+    var argument string = op_getargument(thsCell.content)
+
+    if argument[0] == '=' {
+        var cpyCell *CELL = op_getsingle_cell(argument)
+        if cpyCell.celltype != INTEGER {
+            thsCell.content = "!NUM!"
+            thsCell.celltype = ERROR
+            return
+        }
+        numint, _ := strconv.Atoi(cpyCell.content)
+        thsCell.content = strconv.FormatInt( int64(numint), 2 )
+    } else {
+        numint, _ := strconv.Atoi(argument)
+        thsCell.content = strconv.FormatInt( int64(numint), 2 )
+    }
+    thsCell.celltype = BINARY_NUM
 }
