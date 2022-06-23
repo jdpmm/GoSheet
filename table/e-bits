@@ -1,4 +1,5 @@
-"Bitwise Operations"        |
-16         | 15             |
-"16 ^ 15:" | =AND(16;=B1;)  |
-"16 v 15:" | =OR(=A1;=B1;)  |
+"Bitwise Operations"             |
+16              | 15             |
+"16 ^ 15:"      | =AND(16;=B1;)  |
+"16 v 15:"      | =OR(=A1;=B1;)  |
+"16 xor 15: "   | =XOR(=A1;=B1;) |

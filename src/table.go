@@ -17,6 +17,7 @@ const (
     BIN_OP
     AND_OP
     OR_OP
+    XOR_OP
     ERROR
 )
 
@@ -68,7 +69,8 @@ func tbl_setcell (content string, row int, col int) {
     isbinop,   _ := regexp.Compile("^=BIN\\((=[A-Z]{1}[0-9]{1,3}|[0-9]+)\\)$");
     
     isandop,   _ := regexp.Compile("^=AND\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
-    isorop,   _ := regexp.Compile("^=OR\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
+    isorop,    _ := regexp.Compile("^=OR\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
+    isxorop,   _ := regexp.Compile("^=XOR\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
 
     var newC CELL
     newC.row = row;
@@ -95,6 +97,8 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = AND_OP
     } else if isorop.MatchString(content) {
         newC.celltype = OR_OP
+    } else if isxorop.MatchString(content) {
+        newC.celltype = XOR_OP
     } else {
         newC.celltype = ERROR
         newC.content = "!UNK!"
@@ -149,6 +153,9 @@ func Tbl_maketable () {
             }
             if cCell.celltype == OR_OP {
                 Op_or(c_row, c_col)
+            }
+            if cCell.celltype == XOR_OP {
+                Op_xor(c_row, c_col)
             }
 
             if len(cCell.content) > max_dig {

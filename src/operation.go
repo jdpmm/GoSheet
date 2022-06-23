@@ -1,5 +1,4 @@
 package main
-
 import (
     _ "fmt"
     "strconv"
@@ -124,6 +123,8 @@ func Op_copy (row int, col int) {
         Op_and(row_cpy, col_cpy)
     } else if cpyCell.celltype == OR_OP {
         Op_or(row_cpy, col_cpy)
+    } else if cpyCell.celltype == XOR_OP {
+        Op_xor(row_cpy, col_cpy)
     }
 
     thsCell.content = cpyCell.content
@@ -205,5 +206,18 @@ func Op_or (row int, col int) {
         return
     }
     thsCell.content = strconv.Itoa(int(arg1 | arg2))
+    thsCell.celltype = INTEGER
+}
+
+func Op_xor (row int, col int) {
+    var thsCell *CELL = &Table[row][col]
+    argstr1, argstr2 := op_getdouble_args(thsCell.content, 4)
+    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
+
+    if thsCell.celltype == ERROR {
+        thsCell.content = "!REF!"
+        return
+    }
+    thsCell.content = strconv.Itoa(int(arg1 ^ arg2))
     thsCell.celltype = INTEGER
 }
