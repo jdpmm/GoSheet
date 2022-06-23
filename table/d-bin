@@ -1,5 +1,5 @@
 "Generating binary numbers" |
--4          | 5     |  1004 |
+4           | 5     |  1004 |
 =BIN(=A1)   |
 =BIN(=B1)   |
 =BIN(=C1)   |

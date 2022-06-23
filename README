@@ -9,6 +9,8 @@ Errors
     ~ !N/A!: Not available, may be a loop has happened.
     ~ !REF!: There is not a correct argument to any function.
     ~ !NUM!: Trying to change the base of anything some invalid argument.
+    ~ !INT!: 32 bit integer overflow.
+    ~ !BIN!: 32 bit integer overflow (in binary representation).
 
 0==========================0
 Functions
@@ -30,3 +32,6 @@ Functions
 
     ~ =OR(=XY;INTEGER_NUMBER) (and all its variations)
         Makes the or bitwise operation given to arguments.
+
+    ~ =XOR(=XY;INTEGER_NUMBER) (and all its variations)
+        Makes the xor bitwise operation given to arguments.

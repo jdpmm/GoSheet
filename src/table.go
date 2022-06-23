@@ -52,9 +52,14 @@ func tbl_aux_stripwhitespaces (str string) string {
             newstr += string(str[idx])
         }
     }
-
-
     return newstr
+}
+
+func tbl_print (content string) {
+    fmt.Printf("%s ", content)
+    for spc := 0; spc < (max_dig - len(content)); spc++ {
+        fmt.Printf(" ")
+    }
 }
 
 func tbl_setcell (content string, row int, col int) {
@@ -77,16 +82,26 @@ func tbl_setcell (content string, row int, col int) {
     newC.col = col;
     newC.content = content;
     if isinteger.MatchString(content) {
-        newC.celltype = INTEGER
-    } else if isfloat.MatchString(content) {
-        newC.celltype = FLOAT
+        newC.content = Utl_int32(content)
+        if newC.content == "!INT!" {
+            newC.celltype = ERROR
+        } else {
+            newC.celltype = INTEGER
+        }
+    } else if isbinary.MatchString(content) {
+        newC.content = Utl_bin32(content)
+        if newC.content == "!BIN!" {
+            newC.celltype = ERROR
+        } else {
+            newC.celltype = BINARY_NUM
+        }
     } else if isbool.MatchString(content) {
         newC.celltype = BOOL
     } else if isstring.MatchString(content) {
         newC.celltype = STRING
         newC.content = content[1:len(content) - 1] // removes the quotes
-    } else if isbinary.MatchString(content) {
-        newC.celltype = BINARY_NUM
+    } else if isfloat.MatchString(content) {
+        newC.celltype = FLOAT
     } else if iscopyop.MatchString(content) {
         newC.celltype = COPY_OP
     } else if isabsop.MatchString(content) {
@@ -106,12 +121,7 @@ func tbl_setcell (content string, row int, col int) {
     Table[row][col] = newC
 }
 
-func tbl_print (content string) {
-    fmt.Printf(" %s ", content)
-    for spc := 0; spc < (max_dig - len(content)); spc++ {
-        fmt.Printf(" ")
-    }
-}
+
 
 func Tbl_getrow (rowstr string, rowint int) {
     if len(rowstr) == 0 {
@@ -148,14 +158,8 @@ func Tbl_maketable () {
             if cCell.celltype == BIN_OP {
                 Op_bin(c_row, c_col)
             }
-            if cCell.celltype == AND_OP {
-                Op_and(c_row, c_col)
-            }
-            if cCell.celltype == OR_OP {
-                Op_or(c_row, c_col)
-            }
-            if cCell.celltype == XOR_OP {
-                Op_xor(c_row, c_col)
+            if cCell.celltype == AND_OP || cCell.celltype == OR_OP || cCell.celltype == XOR_OP {
+                Op_bitwise(c_row, c_col, cCell.celltype)
             }
 
             if len(cCell.content) > max_dig {
@@ -170,6 +174,6 @@ func Tbl_printable () {
         for c_col := 0; c_col < max_col; c_col++ {
             tbl_print(Table[c_row][c_col].content)
         }
-        fmt.Println()
+        fmt.Printf("\n")
     }
 }

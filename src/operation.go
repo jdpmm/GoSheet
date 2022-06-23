@@ -113,18 +113,16 @@ func Op_copy (row int, col int) {
     }
 
     var cpyCell *CELL = &Table[row_cpy][col_cpy]
-    if cpyCell.celltype == COPY_OP {
+    var cpType CELL_TYPE = cpyCell.celltype
+
+    if cpType == COPY_OP {
         Op_copy(row_cpy, col_cpy)
-    } else if cpyCell.celltype == ABS_OP {
+    } else if cpType == ABS_OP {
         Op_abs(row_cpy, col_cpy)
-    } else if cpyCell.celltype == BIN_OP {
+    } else if cpType == BIN_OP {
         Op_bin(row_cpy, col_cpy)
-    } else if cpyCell.celltype == AND_OP {
-        Op_and(row_cpy, col_cpy)
-    } else if cpyCell.celltype == OR_OP {
-        Op_or(row_cpy, col_cpy)
-    } else if cpyCell.celltype == XOR_OP {
-        Op_xor(row_cpy, col_cpy)
+    } else if cpType == AND_OP || cpType == OR_OP || cpType == XOR_OP {
+        Op_bitwise(row_cpy, col_cpy, cpType)
     }
 
     thsCell.content = cpyCell.content
@@ -178,46 +176,29 @@ func Op_bin (row int, col int) {
     } else {
         binvalue = "0b" + binvalue
     }
-
     thsCell.content = binvalue
     thsCell.celltype = BINARY_NUM
 }
 
-func Op_and (row int, col int) {
+func Op_bitwise (row int, col int, op CELL_TYPE) {
     var thsCell *CELL = &Table[row][col]
-    argstr1, argstr2 := op_getdouble_args(thsCell.content, 4)
-    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
+    var argstr1, argstr2 string
+    if op == AND_OP || op == XOR_OP {
+        argstr1, argstr2 = op_getdouble_args(thsCell.content, 4)
+    } else {
+        argstr1, argstr2 = op_getdouble_args(thsCell.content, 3)
+    }
 
+    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
     if thsCell.celltype == ERROR {
         thsCell.content = "!REF!"
         return
     }
-    thsCell.content = strconv.Itoa(int(arg1 & arg2))
-    thsCell.celltype = INTEGER
-}
 
-func Op_or (row int, col int) {
-    var thsCell *CELL = &Table[row][col]
-    argstr1, argstr2 := op_getdouble_args(thsCell.content, 3)
-    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
-
-    if thsCell.celltype == ERROR {
-        thsCell.content = "!REF!"
-        return
-    }
-    thsCell.content = strconv.Itoa(int(arg1 | arg2))
-    thsCell.celltype = INTEGER
-}
-
-func Op_xor (row int, col int) {
-    var thsCell *CELL = &Table[row][col]
-    argstr1, argstr2 := op_getdouble_args(thsCell.content, 4)
-    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
-
-    if thsCell.celltype == ERROR {
-        thsCell.content = "!REF!"
-        return
-    }
-    thsCell.content = strconv.Itoa(int(arg1 ^ arg2))
+    var bitwise_op string
+    if op == AND_OP { bitwise_op = strconv.Itoa(int(arg1 & arg2)) }
+    if op == OR_OP  { bitwise_op = strconv.Itoa(int(arg1 | arg2)) }
+    if op == XOR_OP { bitwise_op = strconv.Itoa(int(arg1 ^ arg2)) }
+    thsCell.content = bitwise_op
     thsCell.celltype = INTEGER
 }
