@@ -119,11 +119,9 @@ func Op_copy (row int, col int) {
         Op_copy(row_cpy, col_cpy)
     } else if cpType == ABS_OP {
         Op_abs(row_cpy, col_cpy)
-    } else if cpType == BIN_OP {
-        Op_bin(row_cpy, col_cpy)
     } else if cpType == AND_OP || cpType == OR_OP || cpType == XOR_OP {
         Op_bitwise(row_cpy, col_cpy, cpType)
-    }
+    } 
 
     thsCell.content = cpyCell.content
     thsCell.celltype = cpyCell.celltype
@@ -152,34 +150,6 @@ func Op_abs (row int, col int) {
     }
 }
 
-func Op_bin (row int, col int) {
-    var thsCell *CELL = &Table[row][col]
-    var argument string = op_getargument(thsCell.content)
-
-    var binvalue string
-    if argument[0] == '=' {
-        var cpyCell *CELL = op_getsingle_cell(argument)
-        if cpyCell.celltype != INTEGER {
-            thsCell.content = "!NUM!"
-            thsCell.celltype = ERROR
-            return
-        }
-        numint, _ := strconv.Atoi(cpyCell.content)
-        binvalue = strconv.FormatInt( int64(numint), 2 )
-    } else {
-        numint, _ := strconv.Atoi(argument)
-        binvalue = strconv.FormatInt( int64(numint), 2 )
-    }
-
-    if binvalue[0] == '-' {
-        binvalue = "-0b" + binvalue[1:]
-    } else {
-        binvalue = "0b" + binvalue
-    }
-    thsCell.content = binvalue
-    thsCell.celltype = BINARY_NUM
-}
-
 func Op_bitwise (row int, col int, op CELL_TYPE) {
     var thsCell *CELL = &Table[row][col]
     var argstr1, argstr2 string
@@ -195,10 +165,11 @@ func Op_bitwise (row int, col int, op CELL_TYPE) {
         return
     }
 
-    var bitwise_op string
-    if op == AND_OP { bitwise_op = strconv.Itoa(int(arg1 & arg2)) }
-    if op == OR_OP  { bitwise_op = strconv.Itoa(int(arg1 | arg2)) }
-    if op == XOR_OP { bitwise_op = strconv.Itoa(int(arg1 ^ arg2)) }
-    thsCell.content = bitwise_op
+    var bitwise_op int
+    if op == AND_OP { bitwise_op = (arg1 & arg2) }
+    if op == OR_OP  { bitwise_op = (arg1 | arg2) }
+    if op == XOR_OP { bitwise_op = (arg1 ^ arg2) }
+
+    thsCell.content = strconv.Itoa(bitwise_op)
     thsCell.celltype = INTEGER
 }

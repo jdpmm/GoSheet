@@ -10,7 +10,6 @@ Errors
     ~ !REF!: There is not a correct argument to any function.
     ~ !NUM!: Trying to change the base of anything some invalid argument.
     ~ !INT!: 32 bit integer overflow.
-    ~ !BIN!: 32 bit integer overflow (in binary representation).
 
 0==========================0
 Functions
