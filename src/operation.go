@@ -3,6 +3,7 @@ package main
 import (
     _ "fmt"
     "strconv"
+    "strings"
 )
 
 /**
@@ -26,6 +27,10 @@ func op_getcoords_cell (strcont string) (int, int) {
      * **/
      var col int = int(strcont[1]) - 65
      row, _ := strconv.Atoi(strcont[2:])
+
+     // XXX: Could be better
+     if col > max_col { col = 0 }
+     if row > max_row { row = 0 }
      return row, col
 }
 
@@ -38,6 +43,52 @@ func op_getsingle_cell (coord string) *CELL {
     row_arg, col_arg := op_getcoords_cell(coord)
     var cellagr *CELL = &Table[row_arg][col_arg]
     return cellagr
+}
+
+func op_getdouble_args (arg string, lpar_idx int) (string, string) {
+    /**
+     * When there is a function that takes two arguments as AND
+     * this function will be called and the return will be those arguments.
+     * **/
+    var twocoords string = arg[lpar_idx + 1:len(arg) - 1]
+    arguments := strings.Split(twocoords, ";")
+    return arguments[0], arguments[1]
+}
+
+func op_setvalues_2args (cCell *CELL, arg1 string, arg2 string) (int, int) {
+    /**
+     * This function will be called when some function takes
+     * two arguments and those arguments must be numbers such as
+     * AND function.
+     * **/
+     var iscell CELL
+     var rowcll, colcll int
+     var r_arg1, r_arg2 int
+
+     if arg1[0] == '=' {
+         rowcll, colcll = op_getcoords_cell(arg1)
+         iscell = Table[rowcll][colcll]
+         if iscell.celltype != INTEGER {
+             cCell.celltype = ERROR
+             return -1, -1
+         }
+         r_arg1, _ = strconv.Atoi(iscell.content)
+     } else {
+         r_arg1, _ = strconv.Atoi(arg1)
+     }
+
+     if arg2[0] == '=' {
+         rowcll, colcll = op_getcoords_cell(arg2)
+         iscell = Table[rowcll][colcll]
+         if iscell.celltype != INTEGER {
+             cCell.celltype = ERROR
+             return -1, -1
+         }
+         r_arg2, _ = strconv.Atoi(iscell.content)
+     } else {
+         r_arg2, _ = strconv.Atoi(arg2)
+     }
+     return r_arg1, r_arg2
 }
 
 func op_getargument (cellcont string) string {
@@ -69,6 +120,10 @@ func Op_copy (row int, col int) {
         Op_abs(row_cpy, col_cpy)
     } else if cpyCell.celltype == BIN_OP {
         Op_bin(row_cpy, col_cpy)
+    } else if cpyCell.celltype == AND_OP {
+        Op_and(row_cpy, col_cpy)
+    } else if cpyCell.celltype == OR_OP {
+        Op_or(row_cpy, col_cpy)
     }
 
     thsCell.content = cpyCell.content
@@ -125,4 +180,30 @@ func Op_bin (row int, col int) {
 
     thsCell.content = binvalue
     thsCell.celltype = BINARY_NUM
+}
+
+func Op_and (row int, col int) {
+    var thsCell *CELL = &Table[row][col]
+    argstr1, argstr2 := op_getdouble_args(thsCell.content, 4)
+    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
+
+    if thsCell.celltype == ERROR {
+        thsCell.content = "!REF!"
+        return
+    }
+    thsCell.content = strconv.Itoa(int(arg1 & arg2))
+    thsCell.celltype = INTEGER
+}
+
+func Op_or (row int, col int) {
+    var thsCell *CELL = &Table[row][col]
+    argstr1, argstr2 := op_getdouble_args(thsCell.content, 3)
+    arg1, arg2 := op_setvalues_2args(thsCell, argstr1, argstr2)
+
+    if thsCell.celltype == ERROR {
+        thsCell.content = "!REF!"
+        return
+    }
+    thsCell.content = strconv.Itoa(int(arg1 | arg2))
+    thsCell.celltype = INTEGER
 }

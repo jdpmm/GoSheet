@@ -8,7 +8,7 @@ Errors
 0==========================0
     ~ !UNK!: Unknown type.
     ~ !N/A!: Not available, may be a loop has happened.
-    ~ !REF!: There is not a correct argument to any
+    ~ !REF!: There is not a correct argument to any function.
     ~ !NUM!: Trying to change the base of anything some invalid argument.
 
 0==========================0
@@ -18,8 +18,16 @@ Functions
         ~ X: Column [A-Z]
         ~ Y: Row    [0-499]
         It's able to copy the content from another cell.
+
     ~ =ABS(=XY):
         Abs mathematical function, only works if the argument is a coordinate
         of another cell.
-    ~ =BIN(=XY) or =BIN(UNISGNED_INTEGER_NUMBER):
-        Converts any unisgned integer number to its binary representation.
+
+    ~ =BIN(=XY) or =BIN(INTEGER_NUMBER):
+        Converts some integer number to its binary representation.
+
+    ~ =AND(=XY;INTEGER_NUMBER) (and all its variations)
+        Makes the and bitwise operation given to arguments.
+
+    ~ =OR(=XY;INTEGER_NUMBER) (and all its variations)
+        Makes the or bitwise operation given to arguments.
