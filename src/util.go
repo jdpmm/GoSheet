@@ -20,3 +20,31 @@ func Utl_bin32 (num string) string {
     }
     return num
 }
+
+func Utl_min (field []CELL) (int, float32, string) {
+    var minint int = 0
+    var minfloat float32 = 0.0
+
+    var n_ints, n_floats int = 0, 0
+    var cu_cell CELL
+
+    for idx := 0; idx < len(field); idx++ {
+        cu_cell = field[idx]
+        if cu_cell.celltype == INTEGER {
+            if cu_cell.asint < minint {
+                minint = cu_cell.asint
+            }
+            n_ints++
+        } else {
+            if cu_cell.asfloat < minfloat {
+                minfloat = cu_cell.asfloat
+            }
+            n_floats++
+        }
+    }
+
+    if n_ints > n_floats {
+        return minint, minfloat, "int"
+    }
+    return minint, minfloat, "float"
+}
