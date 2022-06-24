@@ -34,3 +34,9 @@ Functions
 
     ~ =XOR(=XY;INTEGER_NUMBER) (and all its variations)
         Makes the xor bitwise operation given to arguments.
+
+    ~ =MIN(=XY;=XY;)
+        Set the minimum value in a specific range.
+
+    ~ =MAX(=XY;=XY;)
+        Set the maximum value in a specific range.

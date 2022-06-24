@@ -169,7 +169,9 @@ func Op_copy (row int, col int) {
         Op_abs(row_cpy, col_cpy)
     } else if cpType == AND_OP || cpType == OR_OP || cpType == XOR_OP {
         Op_bitwise(row_cpy, col_cpy, cpType)
-    } 
+    } else if cpType == MAX_OP || cpType == MIN_OP {
+        Op_minmax(row_cpy, col_cpy, cpType)
+    }
 
 
     if cpyCell.celltype == INTEGER { thsCell.asint = cpyCell.asint }
@@ -229,11 +231,11 @@ func Op_bitwise (row int, col int, op CELL_TYPE) {
     thsCell.asint = bitwise_op
 }
 
-func Op_min (row int, col int) {
+func Op_minmax (row int, col int, type_ CELL_TYPE) {
     var thsCell *CELL = &Table[row][col]
     var cells []CELL = op_getcells_field(thsCell.content, 4)
 
-    asint, asfloat, should_be := Utl_min(cells)
+    asint, asfloat, should_be := Utl_minmax(cells, type_)
     if should_be == "int" {
         thsCell.content = strconv.Itoa(asint)
         thsCell.asint = asint

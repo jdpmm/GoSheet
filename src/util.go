@@ -21,9 +21,9 @@ func Utl_bin32 (num string) string {
     return num
 }
 
-func Utl_min (field []CELL) (int, float32, string) {
-    var minint int = 0
-    var minfloat float32 = 0.0
+func Utl_minmax (field []CELL, type_ CELL_TYPE) (int, float32, string) {
+    var _int int = 0
+    var _float float32 = 0.0
 
     var n_ints, n_floats int = 0, 0
     var cu_cell CELL
@@ -31,20 +31,18 @@ func Utl_min (field []CELL) (int, float32, string) {
     for idx := 0; idx < len(field); idx++ {
         cu_cell = field[idx]
         if cu_cell.celltype == INTEGER {
-            if cu_cell.asint < minint {
-                minint = cu_cell.asint
-            }
+            if cu_cell.asint < _int && type_ == MIN_OP { _int = cu_cell.asint }
+            if cu_cell.asint > _int && type_ == MAX_OP { _int = cu_cell.asint }
             n_ints++
         } else {
-            if cu_cell.asfloat < minfloat {
-                minfloat = cu_cell.asfloat
-            }
+            if cu_cell.asfloat < _float && type_ == MIN_OP { _float = cu_cell.asfloat }
+            if cu_cell.asfloat > _float && type_ == MIN_OP { _float = cu_cell.asfloat }
             n_floats++
         }
     }
 
     if n_ints > n_floats {
-        return minint, minfloat, "int"
+        return _int, _float, "int"
     }
-    return minint, minfloat, "float"
+    return _int, _float, "float"
 }

@@ -78,6 +78,7 @@ func tbl_setcell (content string, row int, col int) {
     iscopyop,  _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$")
     isabsop,   _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$")
     isminop,   _ := regexp.Compile("^=MIN\\((=[A-Z]{1}[0-9]{1,3};){2}\\)$")
+    ismaxop,   _ := regexp.Compile("^=MAX\\((=[A-Z]{1}[0-9]{1,3};){2}\\)$")
     
     isandop,   _ := regexp.Compile("^=AND\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
     isorop,    _ := regexp.Compile("^=OR\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
@@ -116,6 +117,8 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = XOR_OP
     } else if isminop.MatchString(content) {
         newC.celltype = MIN_OP
+    } else if ismaxop.MatchString(content) {
+        newC.celltype = MAX_OP
     } else {
         newC.celltype = ERROR
         newC.content = "!UNK!"
@@ -158,8 +161,8 @@ func Tbl_maketable () {
             if cCell.celltype == AND_OP || cCell.celltype == OR_OP || cCell.celltype == XOR_OP {
                 Op_bitwise(c_row, c_col, cCell.celltype)
             }
-            if cCell.celltype == MIN_OP {
-                Op_min(c_row, c_col)
+            if cCell.celltype == MIN_OP || cCell.celltype == MAX_OP {
+                Op_minmax(c_row, c_col, cCell.celltype)
             }
 
             if len(cCell.content) > max_dig {
