@@ -21,6 +21,7 @@ const (
     XOR_OP
     MIN_OP
     MAX_OP
+    ARITH_OP
 
     ERROR
 )
@@ -34,6 +35,13 @@ type CELL struct {
     asint    int
     asfloat  float32
 }
+
+/**
+ * regex used not only in this golang file
+ * **/
+var isinteger, _ = regexp.Compile("^(-|)\\d+$")
+var isfloat,   _ = regexp.Compile("^(-|)\\d+.\\d+$")
+var iscopyop,  _ = regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$")
 
 /**
  * max_row and max_col works to know how long the table is, and know which cells
@@ -70,15 +78,13 @@ func tbl_print (content string) {
 }
 
 func tbl_setcell (content string, row int, col int) {
-    isinteger, _ := regexp.Compile("^(-|)\\d+$")
-    isfloat,   _ := regexp.Compile("^(-|)\\d+.\\d+$")
     isbool,    _ := regexp.Compile("^(TRUE|FALSE)$")
     isstring,  _ := regexp.Compile("^\".*\"$")
 
-    iscopyop,  _ := regexp.Compile("^=[A-Z]{1}[0-9]{1,3}$")
     isabsop,   _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$")
     isminop,   _ := regexp.Compile("^=MIN\\((=[A-Z]{1}[0-9]{1,3};){2}\\)$")
     ismaxop,   _ := regexp.Compile("^=MAX\\((=[A-Z]{1}[0-9]{1,3};){2}\\)$")
+    isarithop, _ := regexp.Compile("^=ARITH\\((.+,){2,}\\)$")
     
     isandop,   _ := regexp.Compile("^=AND\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
     isorop,    _ := regexp.Compile("^=OR\\((=[A-Z]{1}[0-9]{1,3};|(-|)[0-9]+;){2}\\)$");
@@ -88,6 +94,8 @@ func tbl_setcell (content string, row int, col int) {
     newC.row = row;
     newC.col = col;
     newC.content = content;
+
+    // XXX: Could be better
     if isinteger.MatchString(content) {
         newC.content = Utl_int32(content)
         if newC.content == "!INT!" {
@@ -119,6 +127,8 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = MIN_OP
     } else if ismaxop.MatchString(content) {
         newC.celltype = MAX_OP
+    } else if isarithop.MatchString(content) {
+        newC.celltype = ARITH_OP
     } else {
         newC.celltype = ERROR
         newC.content = "!UNK!"
@@ -163,6 +173,9 @@ func Tbl_maketable () {
             }
             if cCell.celltype == MIN_OP || cCell.celltype == MAX_OP {
                 Op_minmax(c_row, c_col, cCell.celltype)
+            }
+            if cCell.celltype == ARITH_OP {
+                Op_arith(c_row, c_col)
             }
 
             if len(cCell.content) > max_dig {

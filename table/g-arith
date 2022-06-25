@@ -1,0 +1,5 @@
+"Arithmetic operations"  |
+=ARITH(4, *, 2,)         |
+=ARITH(345, /, 43,)      |
+=ARITH(2, +, 3, *, 3,)   |
+=ARITH(0, /, 0,)         |
