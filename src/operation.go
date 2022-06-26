@@ -4,6 +4,7 @@ import (
     "strconv"
     "strings"
     "math"
+    "os"
 )
 
 /**
@@ -32,8 +33,10 @@ func op_getcoords_cell (strcont string) (int, int) {
      var col int = int(strcont[1]) - 65
      row, _ := strconv.Atoi(strcont[2:])
 
-     if col > max_col { col = 0 }
-     if row > max_row { row = 0 }
+     if col > max_col || row > max_row {
+         fmt.Printf("(%s coordinate): Unreachable coordinate.\n", strcont)
+         os.Exit(1)
+     }
      return row, col
 }
 
@@ -173,6 +176,8 @@ func Op_copy (row int, col int) {
         Op_minmax(row_cpy, col_cpy, cpType)
     } else if cpType == ARITH_OP {
         Op_arith(row_cpy, col_cpy)
+    } else if cpType == F_STRING {
+        Op_fstring(row_cpy, col_cpy)
     }
 
     if cpyCell.celltype == INTEGER { thsCell.asint = cpyCell.asint }
@@ -381,4 +386,33 @@ func Op_arith (row int, col int) {
         thsCell.content = "!DIV!"
         thsCell.celltype = ERROR
     }
+}
+
+func Op_fstring (row int, col int) {
+    var thsCell *CELL = &Table[row][col]
+    var str string = thsCell.content
+    var strformated, fcoord string
+
+    for idx := 0; idx < len(str); idx++ {
+        if str[idx] == '{' {
+            fcoord = ""
+            for str[idx] != '}' {
+                if idx + 1 >= len(str) {
+                    thsCell.content = "!FST!"
+                    thsCell.celltype = ERROR
+                    return
+                }
+                idx++
+                fcoord += string(str[idx])
+            }
+
+            var fcell *CELL = op_getsingle_cell(fcoord[:len(fcoord) - 1])
+            strformated += fcell.content
+        } else {
+            strformated += string(str[idx])
+        }
+    }
+
+    thsCell.content = strformated
+    thsCell.celltype = STRING
 }

@@ -13,6 +13,7 @@ const (
     STRING
     BOOL
     BINARY_NUM
+    F_STRING
 
     COPY_OP
     ABS_OP
@@ -57,15 +58,9 @@ func tbl_aux_stripwhitespaces (str string) string {
     var newstr string
     var instr bool = false
     for idx := 0; idx < len(str); idx++ {
-        if str[idx] == '"' {
-            instr = !instr
-        }
-        if str[idx] != ' ' && !instr {
-            newstr += string(str[idx])
-        }
-        if instr {
-            newstr += string(str[idx])
-        }
+        if str[idx] == '"' || str[idx] == '\'' { instr = !instr }
+        if str[idx] != ' ' && !instr { newstr += string(str[idx]) }
+        if instr { newstr += string(str[idx]) }
     }
     return newstr
 }
@@ -80,6 +75,7 @@ func tbl_print (content string) {
 func tbl_setcell (content string, row int, col int) {
     isbool,    _ := regexp.Compile("^(TRUE|FALSE)$")
     isstring,  _ := regexp.Compile("^\".*\"$")
+    isfstring, _ := regexp.Compile("^'.+'$")
 
     isabsop,   _ := regexp.Compile("^=ABS\\(=[A-Z]{1}[0-9]{1,3}\\)$")
     isminop,   _ := regexp.Compile("^=MIN\\((=[A-Z]{1}[0-9]{1,3};){2}\\)$")
@@ -128,6 +124,9 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = MAX_OP
     } else if isarithop.MatchString(content) {
         newC.celltype = ARITH_OP
+    } else if isfstring.MatchString(content) {
+        newC.celltype = F_STRING
+        newC.content = content[1:len(content) - 1]
     } else {
         newC.celltype = ERROR
         newC.content = "!UNK!"
@@ -161,21 +160,12 @@ func Tbl_maketable () {
             cCell = &Table[c_row][c_col]
             Op_setnoloops(-1, -1)
 
-            if cCell.celltype == COPY_OP {
-                Op_copy(c_row, c_col)
-            }
-            if cCell.celltype == ABS_OP {
-                Op_abs(c_row, c_col)
-            }
-            if cCell.celltype == AND_OP || cCell.celltype == OR_OP || cCell.celltype == XOR_OP {
-                Op_bitwise(c_row, c_col, cCell.celltype)
-            }
-            if cCell.celltype == MIN_OP || cCell.celltype == MAX_OP {
-                Op_minmax(c_row, c_col, cCell.celltype)
-            }
-            if cCell.celltype == ARITH_OP {
-                Op_arith(c_row, c_col)
-            }
+            if cCell.celltype == COPY_OP                                                       { Op_copy(c_row, c_col) }
+            if cCell.celltype == ABS_OP                                                        { Op_abs(c_row, c_col) }
+            if cCell.celltype == AND_OP || cCell.celltype == OR_OP || cCell.celltype == XOR_OP { Op_bitwise(c_row, c_col, cCell.celltype) }
+            if cCell.celltype == MIN_OP || cCell.celltype == MAX_OP                            { Op_minmax(c_row, c_col, cCell.celltype) }
+            if cCell.celltype == ARITH_OP                                                      { Op_arith(c_row, c_col) }
+            if cCell.celltype == F_STRING                                                      { Op_fstring(c_row, c_col) }
 
             if len(cCell.content) > max_dig {
                 max_dig = len(cCell.content)
