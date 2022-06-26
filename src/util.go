@@ -22,13 +22,15 @@ func Utl_bin32 (num string) string {
 }
 
 func Utl_minmax (field []CELL, type_ CELL_TYPE) (int, float32, string) {
-    var _int int = 0
-    var _float float32 = 0.0
+    var _int int
+    var _float float32
 
     var n_ints, n_floats int = 0, 0
-    var cu_cell CELL
+    var cu_cell CELL = field[0]
+    if cu_cell.celltype == INTEGER { _int = cu_cell.asint }
+    if cu_cell.celltype == FLOAT { _float = cu_cell.asfloat }
 
-    for idx := 0; idx < len(field); idx++ {
+    for idx := 1; idx < len(field); idx++ {
         cu_cell = field[idx]
         if cu_cell.celltype == INTEGER {
             if cu_cell.asint < _int && type_ == MIN_OP { _int = cu_cell.asint }

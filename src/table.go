@@ -95,7 +95,6 @@ func tbl_setcell (content string, row int, col int) {
     newC.col = col;
     newC.content = content;
 
-    // XXX: Could be better
     if isinteger.MatchString(content) {
         newC.content = Utl_int32(content)
         if newC.content == "!INT!" {
@@ -108,7 +107,7 @@ func tbl_setcell (content string, row int, col int) {
         newC.celltype = BOOL
     } else if isstring.MatchString(content) {
         newC.celltype = STRING
-        newC.content = content[1:len(content) - 1] // removes the quotes
+        newC.content = content[1:len(content) - 1]
     } else if isfloat.MatchString(content) {
         newC.celltype = FLOAT
         asfloat, _ := strconv.ParseFloat(content, 32)

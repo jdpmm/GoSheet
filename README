@@ -7,9 +7,11 @@ Errors
 0==========================0
     ~ !UNK!: Unknown type.
     ~ !N/A!: Not available, may be a loop has happened.
-    ~ !REF!: There is not a correct argument to any function.
-    ~ !NUM!: Trying to change the base of anything some invalid argument.
+    ~ !REF!: There is not a correct argument to some function (Expects some especific argument, but was given some diferent).
     ~ !INT!: 32 bit integer overflow.
+    ~ !OPR!: Mathematical operator expected.
+    ~ !AIT!: Wrong arithmetic expression.
+    ~ !DIV!: Division by zero.
 
 0==========================0
 Functions
@@ -40,3 +42,7 @@ Functions
 
     ~ =MAX(=XY;=XY;)
         Set the maximum value in a specific range.
+
+    ~ =ARITH(...,)
+        Makes arithmetic operations such as addition, substraction, division, multiplication, module and power,
+        respect to precedence arithemetic too.

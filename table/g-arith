@@ -1,5 +1,11 @@
 "Arithmetic operations"  |
-=ARITH(4, *, 2,)         |
-=ARITH(345, /, 43,)      |
-=ARITH(2, +, 3, *, 3,)   |
-=ARITH(0, /, 0,)         |
+=ARITH(3, +, 5,)         |
+=ARITH(3, *, 3, ^, 2,)   |
+=ARITH(2, *, 2, *, 3,)   |
+=ARITH(2, +, 2, *, 3,)   |
+=ARITH(=A4, -, 2,)       |
+=ARITH(=A5, -, =A2,)     |
+=ABS(=A6)                |
+=ARITH(=A7, /, 3,)       |
+=ARITH(=A8, %, =A8,)     |
+=ARITH(234, /, =A9,)     |

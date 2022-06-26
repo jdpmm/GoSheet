@@ -198,8 +198,20 @@ func Op_abs (row int, col int) {
             thsCell.content = cpyCell.content
         }
 
-        if cpyCell.celltype == INTEGER { thsCell.asint = cpyCell.asint }
-        if cpyCell.celltype == FLOAT { thsCell.asfloat = cpyCell.asfloat }
+        if cpyCell.celltype == INTEGER {
+            if cpyCell.asint < 0 {
+                thsCell.asint = cpyCell.asint * -1
+            } else {
+                thsCell.asint = cpyCell.asint
+            }
+        }
+        if cpyCell.celltype == FLOAT {
+            if cpyCell.asfloat < 0 {
+                thsCell.asfloat = cpyCell.asfloat * -1
+            } else {
+                thsCell.asfloat = cpyCell.asfloat
+            }
+        }
         thsCell.celltype = cpyCell.celltype
     } else {
         thsCell.content = "!REF!"
@@ -251,44 +263,57 @@ func Op_minmax (row int, col int, type_ CELL_TYPE) {
 
 func Op_arith (row int, col int) {
     var thsCell *CELL = &Table[row][col]
-    var cell_arg = thsCell.content[7 : len(thsCell.content) - 2]
-    args := strings.Split(cell_arg, ",")
+    var operation string = thsCell.content[7 : len(thsCell.content) - 2]
+    args := strings.Split(operation, ",")
 
-    var operations []string
+    /**
+     * values: Saves all numbers in the operation.
+     * operat: Saves all mathematical operators in the operation.
+     * cu_arg: Current argument in the operation.
+     * **/
     var values [] float64
-    var ele string
-    for idx := 0; idx < len(args); idx++ {
-        ele = args[idx]
+    var operat [] string
+    var cu_arg string
+
+    for arg := 0; arg < len(args); arg++ {
+        cu_arg = args[arg]
         /**
-         * When idx variable is odd, it means that the current value on
-         * args vector must be a value for the operation, mathematical
-         * operator otherwise.
+         * When the index in the arguments is even, in that index must be a mathematical
+         * operator.
          * **/
-        if (idx % 2) != 0 {
-            if ele != "+" && ele != "-" && ele != "*" && ele != "/" && ele != "%" {
+        if (arg % 2) != 0 {
+            if cu_arg != "+" && cu_arg != "-" && cu_arg != "*" && cu_arg != "/" && cu_arg != "%" && cu_arg != "^" {
                 thsCell.content = "!OPR!"
                 thsCell.celltype = ERROR
                 break
             }
-            operations = append(operations, ele)
+            operat = append(operat, cu_arg)
         } else {
-            if isinteger.MatchString(ele) {
-                intv, _ := strconv.Atoi(ele)
-                values = append(values, float64(intv))
-            } else if isfloat.MatchString(ele) {
-                floatv, _ := strconv.ParseFloat(ele, 64)
-                values = append(values, floatv)
-            } else if iscopyop.MatchString(ele) {
-                var valCell *CELL = op_getsingle_cell(ele)
-                if valCell.celltype == INTEGER {
-                    values = append(values, float64(valCell.asint))
-                } else if valCell.celltype == FLOAT {
-                    values = append(values, float64(valCell.asfloat))
-                } else {
+            if iscopyop.MatchString(cu_arg) {
+                var numCell *CELL = op_getsingle_cell(cu_arg)
+                if numCell.celltype != INTEGER && numCell.celltype != FLOAT {
                     thsCell.content = "!REF!"
                     thsCell.celltype = ERROR
                     break
                 }
+                /**
+                 * No matter if the cell contains a integer or a float number,
+                 * its reference (str ref) to that number could be parsed to float64.
+                 * **/
+                num_, _ := strconv.ParseFloat(numCell.content, 64)
+                values = append(values, num_)
+            } else if isinteger.MatchString(cu_arg) {
+                cu_arg = Utl_int32(cu_arg)
+                if cu_arg == "!INT!" {
+                    thsCell.content = "!INT!"
+                    thsCell.celltype = ERROR
+                    break
+                }
+                num_, _ := strconv.Atoi(cu_arg)
+                values = append(values, float64(num_))
+            } else if isfloat.MatchString(cu_arg) {
+                num_, _ := strconv.ParseFloat(cu_arg, 64)
+                values = append(values, num_)
             } else {
                 thsCell.content = "!REF!"
                 thsCell.celltype = ERROR
@@ -297,62 +322,63 @@ func Op_arith (row int, col int) {
         }
     }
 
-    /**
-     * For every number must be an operator:
-     *  ~ 4 + 5: Two numbers, one operator
-     *  ~ 4 - 5 * 5: Three numbers, two operators
-     * it means that must be (N numbers - 1) operators
-     * to any operation.
-     * **/
-    if len(values) - 1 != len(operations) {
-        thsCell.content = "!MTH!"
+    if (len(values) - 1) != len(operat) {
+        thsCell.content = "!AIT!"
         thsCell.celltype = ERROR
     }
     if thsCell.celltype == ERROR { return }
 
-    var auxop float64
+    operat = append(operat, "-no-")
     var result float64 = values[0]
-    operations = append(operations, "-/-")
-    var cu_op, nxt_op string
-    for idx := 0; idx < len(operations) - 1; idx++ {
-        cu_op = operations[idx]
-        nxt_op = operations[idx + 1]
-        auxop = 0
+    var auxres float64
+    var cuoper string
+    var ntoper string
 
-        /**
-         * Division zero
-         * **/
-        if cu_op == "/" && values[idx + 1] == 0 {
-            thsCell.content = "!DIV!"
-            thsCell.celltype = ERROR
-            return
-        }
+    for idx := 0; idx < len(operat) - 1; idx++ {
+        cuoper = operat[idx]
+        ntoper = operat[idx + 1]
 
-        if cu_op == "+" || cu_op == "-" {
-            if nxt_op == "+" || nxt_op == "-" || nxt_op == "-/-" {
-                if cu_op == "+" { result += values[idx + 1] }
-                if cu_op == "-" { result -= values[idx + 1] }
+        if cuoper == "+" || cuoper == "-" {
+            if ntoper == "+" || ntoper == "-" || ntoper == "-no-" {
+                if cuoper == "+" { result += values[idx + 1] }
+                if cuoper == "-" { result -= values[idx + 1] }
             } else {
-                if nxt_op == "^" {
-                    auxop = math.Pow(values[idx + 1], values[idx + 2])
-                    goto END
+                if ntoper == "^" {
+                    auxres = math.Pow(values[idx + 1], values[idx + 2])
+                    goto FINAL
                 }
-                if nxt_op == "*" { auxop = values[idx + 1] * values[idx + 2] }
-                if nxt_op == "/" { auxop = values[idx + 1] / values[idx + 2] }
-                if nxt_op == "%" { auxop = math.Mod(values[idx + 1], values[idx + 2]) }
+                if ntoper == "*" { auxres = values[idx + 1] * values[idx + 2] }
+                if ntoper == "/" { auxres = values[idx + 1] / values[idx + 2] }
+                if ntoper == "%" { auxres = math.Mod(values[idx + 1], values[idx + 2]) }
 
-                END:
-                if cu_op == "+" { result += auxop }
-                if cu_op == "-" { result -= auxop }
+                FINAL:
+                if cuoper == "+" { result += auxres }
+                if cuoper == "-" { result -= auxres }
                 idx += 1
             }
-        } else if cu_op != "^" {
-            if cu_op == "*" { result *= values[idx + 1] }
-            if cu_op == "/" { result /= values[idx + 1] }
-            if cu_op == "%" { result = math.Mod(result, values[idx + 1]) }
+        } else if cuoper != "^" {
+            if ntoper != "^" {
+                if cuoper == "*" { result *= values[idx + 1] }
+                if cuoper == "/" { result /= values[idx + 1] }
+                if cuoper == "%" { result = math.Mod(result, values[idx + 1]) }
+            } else {
+                auxres = math.Pow(values[idx + 1], values[idx + 2])
+                if cuoper == "*" { result *= auxres }
+                if cuoper == "/" { result /= auxres }
+                if cuoper == "%" { result = math.Mod(result, auxres) }
+                idx += 1
+            }
+        } else {
+            result = math.Pow(result, values[idx + 1])
         }
     }
 
     thsCell.content = fmt.Sprintf("%f", result)
+    thsCell.asfloat = float32(result)
     thsCell.celltype = FLOAT
+
+    if thsCell.content == "+Inf" {
+        thsCell.content = "!DIV!"
+        thsCell.celltype = ERROR
+    }
 }
